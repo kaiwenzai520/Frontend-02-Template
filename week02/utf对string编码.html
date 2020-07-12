@@ -1,0 +1,48 @@
+<script>
+
+
+    // 编写带括号的四则运算产生式
+    <BracketExpression> ::= <Number> 
+                            | <Number>  "+" <MultiplicativeExpression> 
+                            | <Number>  "-" <MultiplicativeExpression> 
+                            | "(" <AddtiveExpression> ")" "*" <MultiplicativeExpression>
+                            | "(" <AddtiveExpression> ")" "/" <MultiplicativeExpression>
+
+    // 方法一:直接用window.TextEncoder() 
+    //TextEncoder.encode(String);接收一个String类型的参数返回一个Unit8Array;
+    function str2utf8(str){
+        var  encoder = new TextEncoder('uft8');
+        return encoder.encode(str);
+    }
+    var str = str2utf8('你好，kevin123');
+    console.log(str);
+
+    //原理是，如果使用 encodeURI(str)，其中如果碰到中文字符之类的，就会按照 utf8 编码之后变成 %E5%91 这个样子，我们利用这个，完了之后再将 % 替换成 \x，就得到了单个字节的串。
+    function strutf8(str) {
+        return eval('\''+encodeURI(str).replace(/%/gm, '\\x')+'\'');
+    }
+
+    console.log(strutf8('你好,kevin123'));
+
+    //兼容方案
+    var str3utf8 = window.TextEncoder ? function(str){
+        var encoder1 = new TextEncoder('utf8');
+        var bytes = encoder1.encode(str);
+        var result = '';
+        for(var  i = 0;i<bytes.length;i++){
+            result += String.fromCharCode(bytes[i]);
+        }
+        return result;
+    } : function(str){
+        return eval('\''+encodeURI(str).replace(/%/gm, '\\x')+'\'');
+    }
+    
+
+    console.log(str3utf8('你好，kevin123'));
+
+    //扩展：fromCharCode fromCharCode() 可接受一个指定的 Unicode 值，然后返回一个字符串
+
+    document.write(String.fromCharCode(72,69,76,76,79))//hello
+    document.write("<br />")
+    document.write(String.fromCharCode(65,66,67))//abc
+</script>
